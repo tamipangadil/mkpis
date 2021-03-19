@@ -7,10 +7,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/jmartin82/mkpis/internal/config"
-	"github.com/jmartin82/mkpis/internal/ui"
+	"github.com/tamipangadil/mkpis/internal/config"
+	"github.com/tamipangadil/mkpis/internal/ui"
 
-	"github.com/jmartin82/mkpis/pkg/vcs/ghapi"
+	"github.com/tamipangadil/mkpis/pkg/vcs/ghapi"
 )
 
 func printError(err string) {

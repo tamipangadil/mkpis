@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/jmartin82/mkpis/pkg/vcs"
+	"github.com/tamipangadil/mkpis/pkg/vcs"
 
 	"github.com/google/go-github/v32/github" // with go modules enabled (GO111MODULE=on or outside GOPATH)
 	"golang.org/x/oauth2"

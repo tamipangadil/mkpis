@@ -1,4 +1,4 @@
-module github.com/jmartin82/mkpis
+module github.com/tamipangadil/mkpis
 
 go 1.14
 

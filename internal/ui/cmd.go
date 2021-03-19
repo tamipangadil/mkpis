@@ -9,7 +9,7 @@ import (
 
 	"github.com/common-nighthawk/go-figure"
 	"github.com/davidscholberg/go-durationfmt"
-	"github.com/jmartin82/mkpis/pkg/vcs"
+	"github.com/tamipangadil/mkpis/pkg/vcs"
 	"github.com/olekukonko/tablewriter"
 )
 
@@ -57,20 +57,25 @@ func (u CmdUI) Render(from, to time.Time) error {
 	if err != nil {
 		return err
 	}
-	rrb, err := u.getReleaseBranchReport(from, to)
-	if err != nil {
-		return err
-	}
+	// rrb, err := u.getReleaseBranchReport(from, to)
+	// if err != nil {
+	// 	return err
+	// }
 
-	myFigure := figure.NewColorFigure("Printing the reports...", "standard", "white", true)
-	myFigure.Blink(1000, 300, 300)
+	// myFigure := figure.NewColorFigure("Printing the reports...", "standard", "white", true)
+	// myFigure.Blink(1000, 300, 300)
 
-	fmt.Println("\033[2J") //clean previous ouput
+	// fmt.Println("\033[2J") //clean previous ouput
 	u.PrintPageHeader(from, to)
-	u.PrintRepotHeader("Feature Branch Report")
+	// u.PrintRepotHeader("Feature Branch Report")
+	fmt.Println("")
+	fmt.Println("PR Report")
+	fmt.Println("")
 	fmt.Println(rfb)
-	u.PrintRepotHeader("Release Branch Report")
-	fmt.Println(rrb)
+	// u.PrintRepotHeader("Release Branch Report")
+	// fmt.Println("Release Branch Report")
+	// fmt.Println("")
+	// fmt.Println(rrb)
 	return nil
 }
 
@@ -80,9 +85,9 @@ func (u CmdUI) PrintRepotHeader(text string) {
 }
 
 func (u CmdUI) PrintPageHeader(from time.Time, to time.Time) {
-	figure.NewColorFigure("MKPIS", "standard", "red", true).Print()
+	// figure.NewColorFigure("MKPIS", "standard", "red", true).Print()
 	fLayout := "2006-02-01"
-	fmt.Printf("\n Repo: %s/%s (%s-%s)", u.owner, u.repo, from.Format(fLayout), to.Format(fLayout))
+	fmt.Printf("Repo: %s/%s (%s to %s)", u.owner, u.repo, from.Format(fLayout), to.Format(fLayout))
 	fmt.Println("")
 }
 
