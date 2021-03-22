@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"encoding/csv"
 
 	"github.com/common-nighthawk/go-figure"
 	"github.com/davidscholberg/go-durationfmt"
@@ -21,6 +22,14 @@ func AvgDurationFormater(d time.Duration) string {
 	return t
 }
 
+func AvgDurationInSecondsFormater(d time.Duration) string {
+	t, err := durationfmt.Format(d, "%s")
+	if err != nil {
+		return "ERROR"
+	}
+	return t
+}
+
 func DurationFormater(d time.Duration) string {
 
 	if d.Microseconds() == 0 {
@@ -28,6 +37,19 @@ func DurationFormater(d time.Duration) string {
 	}
 
 	t, err := durationfmt.Format(d, "%hh %mm")
+	if err != nil {
+		return "ERROR"
+	}
+	return t
+}
+
+func DurationInSecondsFormatter(d time.Duration) string {
+
+	if d.Microseconds() == 0 {
+		return "--"
+	}
+
+	t, err := durationfmt.Format(d, "%s")
 	if err != nil {
 		return "ERROR"
 	}
@@ -61,6 +83,7 @@ func (u CmdUI) Render(from, to time.Time) error {
 	// if err != nil {
 	// 	return err
 	// }
+	u.getFeatureBranchReportCSV(from, to)
 
 	// myFigure := figure.NewColorFigure("Printing the reports...", "standard", "white", true)
 	// myFigure.Blink(1000, 300, 300)
@@ -89,6 +112,45 @@ func (u CmdUI) PrintPageHeader(from time.Time, to time.Time) {
 	fLayout := "2006-02-01"
 	fmt.Printf("Repo: %s/%s (%s to %s)", u.owner, u.repo, from.Format(fLayout), to.Format(fLayout))
 	fmt.Println("")
+}
+
+func (u CmdUI) getFeatureBranchReportCSV(from, to time.Time) (string, error) {
+	prs, err := u.client.GetMergedPRList(u.owner, u.repo, from, to, u.develBranch)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error gathering information: %s", err.Error())
+		return "", err
+	}
+
+	fLayout := "2006-02-01"
+	csvFilename := fmt.Sprintf("%s-to-%s.csv", from.Format(fLayout), to.Format(fLayout))
+	csvfile, err := os.Create(csvFilename)
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed creating file: %s", err.Error())
+	}
+
+	csvwriter := csv.NewWriter(csvfile)
+	csvwriter.Write([]string{"PR", "Commits", "Size", "Time To First Review", "Review time", "Last Review To Merge", "Comments", "PR Lead Time", "Time To Merge"})
+
+	for _, pr := range prs {
+		_ = csvwriter.Write([]string{
+			strconv.Itoa(pr.Number),
+			strconv.Itoa(pr.Commits),
+			strconv.Itoa(pr.ChangedLines),
+			DurationInSecondsFormatter(pr.TimeToFirstReview()),
+			DurationInSecondsFormatter(pr.TimeToReview()),
+			DurationInSecondsFormatter(pr.LastReviewToMerge()),
+			strconv.Itoa(pr.ReviewComments),
+			DurationInSecondsFormatter(pr.PRLeadTime()),
+			DurationInSecondsFormatter(pr.TimeToMerge()),
+		})
+	}
+
+	csvwriter.Flush()
+
+	csvfile.Close()
+
+	return fmt.Sprintf("Generated CSV: %s", csvFilename), nil
 }
 
 func (u CmdUI) getFeatureBranchReport(from, to time.Time) (string, error) {
@@ -131,7 +193,7 @@ func (u CmdUI) getFeatureBranchReport(from, to time.Time) (string, error) {
 		AvgDurationFormater(kpi.AvgTimeToMerge()),
 	}) // Add Footer
 	table.SetAlignment(tablewriter.ALIGN_LEFT)
-	table.SetBorder(false)
+	table.SetBorder(true)
 	table.Render() // Send output
 	return tableString.String(), nil
 }
