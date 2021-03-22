@@ -109,7 +109,7 @@ func (u CmdUI) PrintRepotHeader(text string) {
 
 func (u CmdUI) PrintPageHeader(from time.Time, to time.Time) {
 	// figure.NewColorFigure("MKPIS", "standard", "red", true).Print()
-	fLayout := "2006-02-01"
+	fLayout := "2006-01-02"
 	fmt.Printf("Repo: %s/%s (%s to %s)", u.owner, u.repo, from.Format(fLayout), to.Format(fLayout))
 	fmt.Println("")
 }
@@ -121,7 +121,7 @@ func (u CmdUI) getFeatureBranchReportCSV(from, to time.Time) (string, error) {
 		return "", err
 	}
 
-	fLayout := "2006-02-01"
+	fLayout := "2006-01-02"
 	csvFilename := fmt.Sprintf("%s-to-%s.csv", from.Format(fLayout), to.Format(fLayout))
 	csvfile, err := os.Create(csvFilename)
 
